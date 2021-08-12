@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const router = express.Router();
 const axios = require("axios");
+const unlinkSync = require("fs").unlinkSync;
 
 // error handler
 router.use((err, req, res, next) => {
@@ -43,7 +44,6 @@ router.post("/upload", (req, res) => {
         // Consultar se JWT é valido
         const url = new URL("https://api.rarepository.ufsc.br/v1/token?token=");
         url.searchParams.set("token", req.body.token);
-
         axios(url.toString())
           .then(() => {
             res.json({
@@ -54,8 +54,14 @@ router.post("/upload", (req, res) => {
               },
             });
           })
-          .catch((error) => {
-            res.status(400).json({ error });
+          .catch(async (error) => {
+            //req.file.path
+            try {
+              await unlinkSync(req.file.path);
+              res.status(400).json({ auth: error });
+            } catch (err) {
+              res.status(400).json({ auth: error, file: err });
+            }
           });
       }
     }
