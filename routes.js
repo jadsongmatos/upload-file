@@ -1,8 +1,9 @@
 const express = require("express");
 const multer = require("multer");
-const router = express.Router();
 const axios = require("axios");
+const path = require("path")
 const unlinkSync = require("fs").unlinkSync;
+const router = express.Router();
 
 // error handler
 router.use((err, req, res, next) => {
@@ -19,7 +20,8 @@ router.use((err, req, res, next) => {
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     //console.log("here1", file);
-    cb(null, "./tmp/" + file.fieldname);
+    const dir = path.join(__dirname, "/tmp/", file.fieldname);
+    cb(null, dir);
   },
   filename: function (req, file, cb) {
     //console.log("here2", file);
@@ -52,6 +54,7 @@ router.post("/upload", (req, res) => {
                 mimetype: req.file.mimetype,
                 size: req.file.size,
               },
+              full: req.file,
             });
           })
           .catch(async (error) => {
