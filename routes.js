@@ -1,7 +1,7 @@
 const express = require("express");
 const multer = require("multer");
-const fs = require("fs");
 const router = express.Router();
+const axios = require("axios");
 
 // error handler
 router.use((err, req, res, next) => {
@@ -18,9 +18,7 @@ router.use((err, req, res, next) => {
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     //console.log("here1", file);
-    const dir = "./tmp/" + file.fieldname;
-    fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
+    cb(null, "./tmp/" + file.fieldname);
   },
   filename: function (req, file, cb) {
     //console.log("here2", file);
@@ -41,18 +39,25 @@ router.post("/upload", (req, res) => {
       // An unknown error occurred when uploading.
       res.status(400).json({ err });
     } else {
-      if (req.body.key) {
+      if (req.body.token) {
         // Consultar se JWT é valido
-        console.log(req.body.key);
+        const url = new URL("https://api.rarepository.ufsc.br/v1/token?token=");
+        url.searchParams.set("token", req.body.token);
+
+        axios(url.toString())
+          .then(() => {
+            res.json({
+              file: {
+                filename: req.file.filename,
+                mimetype: req.file.mimetype,
+                size: req.file.size,
+              },
+            });
+          })
+          .catch((error) => {
+            res.status(400).json({ error });
+          });
       }
-      res.json({
-        file: {
-          filename: req.file.filename,
-          mimetype: req.file.mimetype,
-          size: req.file.size,
-        },
-        body: req.body,
-      });
     }
   });
 });
