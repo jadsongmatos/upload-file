@@ -11,8 +11,8 @@ describe("Test the root path", () => {
 
 describe("Test Single File Upload.", () => {
   test("Teste apload txt", async () => {
-    const response = await request(app).post("/upload").attach("file", "./upload.txt");
-    console.log(response)
+    console.log(`${__dirname}/upload.txt`)
+    const response = await request(app).post("/upload").attach("uploaded_file",`${__dirname}/upload.txt`);
     expect(response.statusCode).toBe(200);
   });
 });

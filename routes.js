@@ -28,34 +28,37 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage }).any();
+const upload = multer({ storage: storage }).single("uploaded_file");
 
-const handleUpload = (req, res, next) => {
-  upload(req, res, (err) => {
+router.post("/upload", (req, res) => {
+  upload(req, res, function (err) {
     if (err instanceof multer.MulterError) {
       // A Multer error occurred when uploading.
       console.log("err", err);
-      res.err = err;
+      res.status(400).json({ err });
     } else if (err) {
       console.log(err);
       // An unknown error occurred when uploading.
-      res.err = err;
+      res.status(400).json({ err });
     } else {
-      next();
+      if (req.body.key) {
+        // Consultar se JWT é valido
+        console.log(req.body.key);
+      }
+      res.json({
+        file: {
+          filename: req.file.filename,
+          mimetype: req.file.mimetype,
+          size: req.file.size,
+        },
+        body: req.body,
+      });
     }
   });
-};
-
-router.post("/upload", handleUpload, (req, res) => {
-  if (!res.err) {
-    res.send("ok");
-  } else {
-    res.status(500).json(res.err);
-  }
 });
 
-router.get("/a", (req, res) => {
-  res.json({ title: "Express" });
+router.get("/", (req, res) => {
+  res.json({ routes: ["/upload"] });
 });
 
 module.exports = router;
