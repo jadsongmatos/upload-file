@@ -11,8 +11,15 @@ describe("Test the root path", () => {
 
 describe("Test Single File Upload.", () => {
   test("Teste apload txt", async () => {
-    console.log(`${__dirname}/upload.txt`)
-    const response = await request(app).post("/upload").attach("uploaded_file",`${__dirname}/upload.txt`);
+    console.log(`${__dirname}/upload.txt`);
+    const response = await request(app)
+      .post("/upload")
+      .type("multipart/form-data")
+      .attach("uploaded_file", `${__dirname}/upload.txt`)
+      .field(
+        "token",
+        ""
+      );
     expect(response.statusCode).toBe(200);
   });
 });
