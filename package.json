@@ -9,7 +9,7 @@
   "author": "Jadson G. Matos <jadson.g-matos@outlook.com>",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.26.1",
+    "axios": "^0.27.2",
     "debug": "^4.3.4",
     "express": "^4.17.3",
     "morgan": "^1.10.0",
